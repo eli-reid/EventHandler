@@ -8,10 +8,10 @@ class EventHandler:
     """
     Event Handler
     """
-    _events: dict = dict()
+    def __init__(self) -> None:
+        self._events: dict[str, _event] = {}
 
-    @classmethod
-    def emit(cls, sender: any, event: str, obj: object = None, once: bool = False)->None:
+    def emit(self, sender: any, event: str, obj: object = None, once: bool = False)->None:
         """ EventHandler.emit - Emits event to callback functions
 
             :param sender: what is responsible for the event
@@ -38,12 +38,12 @@ class EventHandler:
         elif not isinstance(once, bool):
             raise TypeError("Requires callback function pointer ex: myCallback(sender, obj)")
         else:
-            cls._register(event)
-            for func in cls._events.get(event).getCallbackFuncs():
+            self._register(event)
+            for func in self._events.get(event).getCallbackFuncs():
                 func(sender, obj)
        
-    @classmethod
-    def on(cls, event: str, func: Callable)->None:
+  
+    def on(self, event: str, func: Callable)->None:
         """ EventHandler.on - sets callback functions to event
 
             :param event: name of event
@@ -63,11 +63,11 @@ class EventHandler:
         elif not isinstance(func, Callable):
             raise TypeError("Requires callback function pointer ex: myCallback(sender, obj)")
         else:
-            cls._register(event)
-            cls._events[event].add(func)
+            self._register(event)
+            self._events[event].add(func)
        
-    @classmethod
-    def removeEvent(cls, event: str)->None:
+  
+    def removeEvent(self, event: str)->None:
         """ EventHandler.removeEvent - Removes event from system
 
             :param event: name of event
@@ -79,14 +79,11 @@ class EventHandler:
             :raise: TypeError if event isn't string
         """
 
-        if not isinstance(event, str):
-            raise TypeError("Event should of type str ")
-        else:
-            if cls._isRegistered(event):
-                del cls._events[event]
+        if self._isRegistered(event):
+            del self._events[event]
          
-    @classmethod
-    def removeFunc(cls, event: str, func: Callable)->None:
+  
+    def removeFunc(self, event: str, func: Callable)->None:
         """ EventHandler.removeFunc - Removes callback fucntion from event
 
             :param event: name of event
@@ -107,10 +104,10 @@ class EventHandler:
         elif not isinstance(func, Callable):
             raise TypeError("Requires callback function pointer ex: myCallback(sender, obj)")
         else:
-            cls._events[event].remove(func)
+            self._events[event].remove(func)
            
-    @classmethod
-    def _isRegistered(cls, event: str)->bool:
+  
+    def _isRegistered(self, event: str)->bool:
         """ EventHandler._isRegister - Checks if event exists 
 
             See if callback function already registered
@@ -126,10 +123,10 @@ class EventHandler:
         if not isinstance(event, str):
             raise TypeError("event should be of type str")
         else:
-            return event in cls._events.keys()
+            return event in self._events.keys()
         
-    @classmethod
-    def _register(cls, event: str)->None:
+  
+    def _register(self, event: str)->None:
         """ EventHandler._register - Creates new event            
 
             :param event: name of event
@@ -140,23 +137,20 @@ class EventHandler:
 
             :raise: TypeError if event isn't string
         """
-        if  not isinstance(event, str):
-            raise TypeError("event should be of type str")
-        else:
-            if not cls._isRegistered(event):
-                cls._events[event]: _event = _event()
+        if not self._isRegistered(event):
+            self._events[event] = _event()
 
-    @classmethod
-    def getEvents(cls)->list:
+  
+    def getEvents(self)->list:
         """ EventHandler.getEvents -  Gets list of events
 
             :returns: list of event names
             :rtype: list[str] or list[]
         """
-        return list(cls._events)
+        return list(self._events)
 
-    @classmethod
-    def getCallbackFuncs(cls, event: str)->list:
+  
+    def getCallbackFuncs(self, event: str)->list:
         """ EventHandler.getCallbackFuncs - gets list of callback functions for event
             
             :returns: list of function pointers or empty list
@@ -168,7 +162,7 @@ class EventHandler:
         if not isinstance(event, str):
             raise TypeError("Event should be of type str") 
         else:
-            return cls._events.get(event).getCallbackFuncs()
+            return self._events.get(event).getCallbackFuncs()
 
 class _event():
     """.. class:: _event
@@ -192,9 +186,9 @@ class _event():
         """
         if not isinstance(func, Callable):
             raise TypeError("Requires callback function pointer ex: myCallback(sender, obj)")
-        else:
-            if self._callbacks.count(func) == 0:
-                self._callbacks.append(func)
+       
+        if self._callbacks.count(func) == 0:
+            self._callbacks.append(func)
             
     def remove(self, func: Callable)->None:
         """ _event.remove - Remove callback function from event
@@ -210,10 +204,10 @@ class _event():
 
         if not isinstance(func, Callable):
             raise TypeError("Requires callback function pointer ex: myCallback(sender, obj)")
-        else:
-            #: Verify list has function before trying to remove function
-            if self._callbacks.count(func) > 0:
-                self._callbacks.remove(func)
+        
+        #: Verify list has function before trying to remove function
+        if self._callbacks.count(func) > 0:
+            self._callbacks.remove(func)
 
     def getCallbackFuncs(self)->list:
         """ _event.getCallbackFuncs - get list of callback functions
